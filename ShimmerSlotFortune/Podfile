@@ -6,5 +6,7 @@ target 'ShimmerSlotFortune' do
   use_frameworks!
 
   # Pods for ShimmerSlotFortune
-
+  pod 'Firebase/Messaging'
+  pod 'AppsFlyerFramework'
+  pod 'FBSDKCoreKit', '17.4.0'
 end

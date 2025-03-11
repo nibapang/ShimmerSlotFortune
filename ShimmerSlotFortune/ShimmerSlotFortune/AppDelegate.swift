@@ -6,14 +6,22 @@
 //
 
 import UIKit
+import FirebaseCore
+import FirebaseMessaging
+import AppsFlyerLib
+import FBSDKCoreKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, AppsFlyerLibDelegate {
 
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        configureFirebase()
+        configureFacebook(with: application, launchOptions: launchOptions)
+        configureAppsFlyer()
         return true
     }
 
@@ -31,6 +39,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // 将 APNs 设备 Token 传递给 Firebase Messaging
+        Messaging.messaging().apnsToken = deviceToken
+    }
+    
+    // MARK: - SDK Configuration Methods
+    
+    private func configureFirebase() {
+        FirebaseApp.configure()
+    }
+    
+    private func configureFacebook(with application: UIApplication,
+                                   launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    private func configureAppsFlyer() {
+        let appsFlyer = AppsFlyerLib.shared()
+        appsFlyer.appsFlyerDevKey = UIViewController.shimmerGetAppsFlyerDevKey()
+        appsFlyer.appleAppID = "6743111327"
+        appsFlyer.waitForATTUserAuthorization(timeoutInterval: 51)
+        appsFlyer.delegate = self
+    }
+    
+    // MARK: - AppsFlyerLibDelegate Methods
+    
+    func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any]) {
+        print("AppsFlyer conversion data success: \(conversionInfo)")
+    }
+    
+    func onConversionDataFail(_ error: Error) {
+        print("AppsFlyer conversion data error: \(error)")
+    }
 }
 
